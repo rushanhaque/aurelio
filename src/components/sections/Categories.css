@@ -1,0 +1,247 @@
+/* ============================================================
+   Categories — full-bleed expanding panels on white.
+   Light image panels, emerald type, no scrim, no gradients,
+   one rounded strip.
+   ============================================================ */
+
+.cat {
+  background: #FFFFFF;
+  overflow: hidden;
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: calc(var(--nav-clear) + clamp(1.8rem, 4.5vh, 3.6rem)) clamp(3rem, 5vh, 4.6rem);
+}
+
+/* Generous header — plenty of air above, and between the kicker, title and lead */
+.cat .sh { margin-bottom: clamp(2rem, 4vh, 3.2rem); }
+.cat .sh-body { margin-top: clamp(1.4rem, 2.6vh, 2.2rem); }
+/* one full-width row on desktop/tablet; wraps only on small phones */
+.cat .sh-title { max-width: none; white-space: nowrap; }
+.cat .sh-lead { margin-top: clamp(1rem, 2vh, 1.6rem); max-width: 48ch; }
+
+/* panel row — one rounded, hairline-bordered strip */
+.cat-panels {
+  display: flex;
+  width: 100%;
+  height: min(76vh, 57.6rem);
+  margin-top: clamp(2.2rem, 4.5vh, 3.6rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.cat-panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  will-change: flex-grow;
+  transition: flex-grow 0.95s var(--ease-silk);
+  border-left: 1px solid var(--line);
+}
+.cat-panel:first-child { border-left: 0; }
+.cat-panel.is-active { flex-grow: 3.4; }
+.cat-panel:focus-visible { outline: 1px solid var(--emerald); outline-offset: -4px; }
+
+/* cover photo — subtle ken-burns scale on the open panel */
+.cat-panel .ph { transition: transform 1.1s var(--ease-silk); transform: scale(1.04); }
+.cat-panel.is-active .ph { transform: scale(1); }
+
+/* legibility scrim over the photography — darkest at the foot where the
+   label and content sit, with a faint top wash so the index reads too */
+.cat-panel-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(7, 37, 27, 0.92) 0%,
+    rgba(7, 37, 27, 0.58) 32%,
+    rgba(7, 37, 27, 0.30) 60%,
+    rgba(7, 37, 27, 0.40) 100%
+  );
+}
+
+/* index, top-left */
+.cat-panel-index {
+  position: absolute;
+  top: clamp(1.2rem, 2vw, 1.8rem);
+  left: clamp(1.1rem, 1.6vw, 1.6rem);
+  z-index: 3;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+  color: #FFFFFF;
+  text-shadow: 0 1px 12px rgba(7, 37, 27, 0.55);
+}
+
+/* vertical label — shown while collapsed */
+.cat-panel-vlabel {
+  position: absolute;
+  bottom: clamp(1.6rem, 3vw, 2.6rem);
+  left: 50%;
+  z-index: 3;
+  writing-mode: vertical-rl;
+  transform: translateX(-50%) rotate(180deg);
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 1.6vw, 1.9rem);
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  text-shadow: 0 1px 14px rgba(7, 37, 27, 0.55);
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.45s var(--ease-out);
+  pointer-events: none;
+}
+.cat-panel.is-active .cat-panel-vlabel { opacity: 0; }
+
+/* full content — revealed on the open panel */
+.cat-panel-content {
+  position: absolute;
+  left: clamp(1.4rem, 2.4vw, 2.6rem);
+  right: clamp(1.4rem, 2.4vw, 2.6rem);
+  bottom: clamp(1.8rem, 3vw, 2.8rem);
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s var(--ease-out), transform 0.8s var(--ease-silk);
+  pointer-events: none;
+}
+.cat-panel.is-active .cat-panel-content { opacity: 1; transform: translateY(0); transition-delay: 0.22s; }
+
+.cat-panel-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.2rem + 2.2vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  margin-bottom: 0.6rem;
+}
+.cat-panel-desc {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  font-weight: 350;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 34ch;
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   TABLET & PHONE — stacked, full-width photo cards.
+   The desktop expanding strip gives way to a single column of
+   tall, self-contained cards, each with its label + description
+   shown by default (no hover needed) and a rounded frame.
+   ============================================================ */
+
+/* tablet — start stacking, relax the one-screen lock */
+@media (max-width: 900px) {
+  .cat {
+    min-height: 0;
+    padding-block: calc(var(--nav-clear) + clamp(1.6rem, 4vh, 3rem)) clamp(2.4rem, 5vh, 4rem);
+  }
+
+  /* let the heading wrap rather than risk a horizontal bleed */
+  .cat .sh-title { white-space: normal; }
+
+  /* the row becomes a column of free-standing cards — drop the shared
+     frame so each card can carry its own rounded corners + gap */
+  .cat-panels {
+    flex-direction: column;
+    height: auto;
+    margin-top: clamp(1.6rem, 3.5vh, 2.6rem);
+    gap: clamp(0.9rem, 2.4vw, 1.4rem);
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .cat-panel {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: clamp(19rem, 50vh, 24rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    /* the expanding-flex transition is irrelevant once stacked */
+    transition: none;
+    will-change: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cat-panel:first-child { border-top: 1px solid var(--line); }
+  .cat-panel.is-active { flex-grow: 0; }
+
+  /* photo sits at rest; the reveal handles any motion */
+  .cat-panel .ph { transform: none; }
+  .cat-panel.is-active .ph { transform: none; }
+
+  /* vertical collapsed label has no role in a stacked card */
+  .cat-panel-vlabel { display: none; }
+
+  /* a touch lighter scrim than desktop — the cards are shorter, so the
+     copy doesn't need as deep a wash to stay legible */
+  .cat-panel-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(7, 37, 27, 0.88) 0%,
+      rgba(7, 37, 27, 0.52) 38%,
+      rgba(7, 37, 27, 0.18) 70%,
+      rgba(7, 37, 27, 0.30) 100%
+    );
+  }
+
+  /* content always visible — GSAP handles the entrance, so no CSS hover state */
+  .cat-panel-content {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    left: clamp(1.3rem, 5vw, 2rem);
+    right: clamp(1.3rem, 5vw, 2rem);
+    bottom: clamp(1.4rem, 5vw, 2rem);
+  }
+  .cat-panel.is-active .cat-panel-content { transition-delay: 0s; }
+
+  .cat-panel-desc { max-width: 40ch; }
+}
+
+/* phone — single column, fuller bleed, comfortable type */
+@media (max-width: 640px) {
+  .cat .sh-title { white-space: normal; letter-spacing: -0.018em; }
+
+  .cat-panels { margin-top: clamp(1.4rem, 5vw, 2rem); gap: clamp(0.85rem, 3vw, 1.2rem); }
+
+  .cat-panel { height: clamp(17rem, 52vh, 22rem); border-radius: var(--radius); }
+
+  .cat-panel-index {
+    top: clamp(1rem, 4vw, 1.4rem);
+    left: clamp(1rem, 4vw, 1.4rem);
+  }
+
+  .cat-panel-name { font-size: clamp(1.7rem, 1.2rem + 4vw, 2.4rem); margin-bottom: 0.45rem; }
+  .cat-panel-desc { font-size: 0.86rem; line-height: 1.5; max-width: none; }
+}
+
+/* small phone — keep everything tappable and uncramped */
+@media (max-width: 400px) {
+  .cat-panel { height: clamp(15.5rem, 56vw, 19rem); }
+  .cat-panel-content {
+    left: clamp(1.1rem, 5vw, 1.5rem);
+    right: clamp(1.1rem, 5vw, 1.5rem);
+    bottom: clamp(1.2rem, 5vw, 1.6rem);
+  }
+  .cat-panel-name { font-size: clamp(1.55rem, 1.1rem + 4.5vw, 2rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-panel, .cat-panel .ph, .cat-panel-content { transition: none; }
+}
