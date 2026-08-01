@@ -92,7 +92,9 @@ export default function Categories() {
             role="button"
             aria-label={`${c.name} — ${c.summary}`}
           >
-            <Placeholder fill tone="dark" type="image" src={c.cover} alt={`${c.name} — Aurelio`} label={c.name} drift={false} />
+            {/* second section on the page — waiting for viewport intersection
+                made these visibly pop in, so start them with the page */}
+            <Placeholder fill eager tone="dark" type="image" src={c.cover} alt={`${c.name} — Aurelio`} label={c.name} drift={false} />
             <span className="cat-panel-scrim" aria-hidden="true" />
 
             <span className="cat-panel-index" aria-hidden="true">{c.index}</span>

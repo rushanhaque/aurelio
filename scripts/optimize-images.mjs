@@ -91,3 +91,24 @@ if (prune) {
   }
   console.log(`pruned ${removed} original PNG/JPEG files`)
 }
+
+/* ---- dimension manifest -------------------------------------------------
+   An <img> with no width/height and `height: auto` has zero height until it
+   decodes. A lazy image inside a box that collapsed to zero never intersects
+   the viewport, so it never loads, so the box stays collapsed — a deadlock
+   that silently emptied the Selected Works grid. Shipping real dimensions
+   reserves the right space up front, which also means no layout shift.
+   Scoped to the folders whose components actually read it — the whole 355-entry
+   map would be ~27kB of dead weight in the Home chunk. Add a prefix here when a
+   new component needs real dimensions.                                        */
+const SIZED = ['assets/HomePage/Selected works']
+
+const manifest = {}
+for (const file of walk('assets').filter((f) => /\.webp$/i.test(f))) {
+  const key = file.split(path.sep).join('/')
+  if (!SIZED.some((prefix) => key.startsWith(prefix))) continue
+  const { width, height } = await sharp(file).metadata()
+  manifest[key] = [width, height]
+}
+fs.writeFileSync('src/data/image-sizes.json', JSON.stringify(manifest, null, 0) + '\n')
+console.log(`wrote src/data/image-sizes.json (${Object.keys(manifest).length} entries)`)

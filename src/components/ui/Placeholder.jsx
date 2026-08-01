@@ -27,6 +27,7 @@ export default function Placeholder({
   drift = true,
   fill = false,
   priority = false,
+  eager = false,
   src,
   alt = '',
   fit = 'cover',
@@ -101,7 +102,10 @@ export default function Placeholder({
           className={`ph-img${imgLoaded ? ' is-loaded' : ''}`}
           src={src}
           alt={alt}
-          loading={priority ? 'eager' : 'lazy'}
+          /* `priority` is for the LCP image — fetch it ahead of everything.
+             `eager` is for imagery just below the fold: start it immediately
+             but at normal priority, so it never competes with the hero. */
+          loading={priority || eager ? 'eager' : 'lazy'}
           fetchpriority={priority ? 'high' : undefined}
           decoding="async"
           onLoad={() => setImgLoaded(true)}

@@ -11,13 +11,22 @@ import { navigate } from '../../lib/router'
 import SectionHeader from '../ui/SectionHeader'
 import Reveal from '../ui/Reveal'
 import Button from '../ui/Button'
+import SIZES from '../../data/image-sizes.json'
 import './Gallery.css'
 
 /* Load every Selected-Works image; resolve each piece's rest + hover frame. */
 const FILES = import.meta.glob('../../../assets/HomePage/Selected works/*.{png,PNG,jpg,jpeg,webp}', { eager: true, import: 'default' })
+
+/* Each frame ships its real pixel dimensions. Without them the <img> is zero
+   tall until it decodes, which collapses .gal-fig; a lazy image inside a
+   collapsed box never reaches the viewport, so it never loads and the box
+   never grows — the grid stayed empty. Real dimensions reserve the space up
+   front, so the images load and nothing shifts as they arrive. */
 const pick = (base) => {
   const key = Object.keys(FILES).find((p) => p.slice(0, p.lastIndexOf('.')).endsWith(`/${base}`))
-  return key ? FILES[key] : undefined
+  if (!key) return undefined
+  const [w, h] = SIZES[key.slice(key.indexOf('assets/'))] || []
+  return { src: FILES[key], w, h }
 }
 
 const PIECES = [
@@ -149,10 +158,27 @@ export default function Gallery() {
             <article key={p.base} className="gal-item">
               <div className="gal-fig">
                 {p.off && (
-                  <img className="gal-img gal-img--off" src={p.off} alt={`${p.name} ${p.suffix}`} loading="lazy" decoding="async" />
+                  <img
+                    className="gal-img gal-img--off"
+                    src={p.off.src}
+                    width={p.off.w}
+                    height={p.off.h}
+                    alt={`${p.name} ${p.suffix}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 )}
                 {p.on && (
-                  <img className="gal-img gal-img--on" src={p.on} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <img
+                    className="gal-img gal-img--on"
+                    src={p.on.src}
+                    width={p.on.w}
+                    height={p.on.h}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 )}
               </div>
               <figcaption className="gal-cap">
